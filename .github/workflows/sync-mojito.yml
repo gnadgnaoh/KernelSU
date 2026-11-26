@@ -1,0 +1,84 @@
+name: Sync Mojito (xxKSU monitor)
+
+on:
+  schedule:
+    # Daily at 08:00 Jakarta (UTC+7)
+    - cron: '0 1 * * *'
+  workflow_dispatch:
+    inputs:
+      force_sync:
+        description: 'Re-sync kernel/ even if the upstream SHA has not changed'
+        type: boolean
+        default: false
+      force_release:
+        description: 'Build and publish a GitHub Release even if nothing changed'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  issues: write
+  actions: read
+
+concurrency:
+  group: sync-mojito
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    outputs:
+      should_release: ${{ steps.check.outputs.should_release }}
+      release_tag: ${{ steps.check.outputs.release_tag }}
+      release_notes: ${{ steps.check.outputs.release_notes }}
+    steps:
+      - name: Checkout sync-mojito
+        uses: actions/checkout@v4
+        with:
+          ref: sync-mojito
+
+      - name: Check backslashxx/KernelSU and fallback to mojito
+        id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          flags=()
+          [[ "${{ inputs.force_sync }}" == "true" ]] && flags+=(--force-sync)
+          [[ "${{ inputs.force_release }}" == "true" ]] && flags+=(--force-release)
+          python3 .github/scripts/sync_mojito.py "${flags[@]}"
+
+      - name: Notify if backslashxx/KernelSU is back online
+        if: steps.check.outputs.upstream_restored == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          title="backslashxx/KernelSU is back online"
+          body="Automated monitor detected that https://github.com/backslashxx/KernelSU is available again (branch \`${{ steps.check.outputs.upstream_branch }}\`, head \`${{ steps.check.outputs.upstream_sha }}\`)."
+          existing=$(gh issue list --state open --search "\"$title\" in:title" --json number --jq '.[0].number // empty')
+          if [[ -n "$existing" ]]; then
+            gh issue comment "$existing" --body "$body"
+          else
+            gh issue create --title "$title" --body "$body"
+          fi
+
+      - name: Commit and push synced changes
+        if: steps.check.outputs.changed == 'true'
+        run: |
+          git config user.name "Najip Ali Munajat"
+          git config user.email "8416702+Najip@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "Nothing to commit."
+            exit 0
+          fi
+          git commit -m "${{ steps.check.outputs.commit_msg }}"
+          git push origin HEAD:sync-mojito
+
+  release:
+    needs: sync
+    if: needs.sync.outputs.should_release == 'true'
+    uses: ./.github/workflows/release.yml
+    with:
+      tag: ${{ needs.sync.outputs.release_tag }}
+      release_notes: ${{ needs.sync.outputs.release_notes }}
+    secrets: inherit

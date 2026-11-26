@@ -1,0 +1,11 @@
+{
+  "active_source": "ximi-mojito/android_kernel_xiaomi_mojito",
+  "active_branch": "personal",
+  "mojito_sha": "a6e6d9b6aa38e831121ad86e721990607176fb0c",
+  "mojito_date": "2026-11-24",
+  "ksu_version": "32733",
+  "upstream_ksu_repo": "backslashxx/KernelSU",
+  "upstream_ksu_status": "unavailable",
+  "upstream_ksu_sha": "",
+  "final_sha": "9a02a5c1"
+}

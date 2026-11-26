@@ -2,7 +2,7 @@ name: Build Manager
 
 on:
   push:
-    branches: [ "main", "dev", "ci", "test", "staging" ]
+    branches: [ "main", "sync-mojito", "dev", "ci", "test", "staging" ]
     paths:
       - '.github/workflows/build-manager.yml'
       - '.github/workflows/build-lkm.yml'
@@ -19,7 +19,7 @@ on:
       - 'Cargo.lock'
       - 'Cargo.toml'
   pull_request:
-    branches: [ "main", "dev" ]
+    branches: [ "main", "sync-mojito", "dev" ]
     paths:
       - '.github/workflows/build-manager.yml'
       - '.github/workflows/build-lkm.yml'
