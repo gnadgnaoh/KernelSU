@@ -82,3 +82,24 @@ jobs:
       tag: ${{ needs.sync.outputs.release_tag }}
       release_notes: ${{ needs.sync.outputs.release_notes }}
     secrets: inherit
+
+  dispatch-kernel:
+    needs: [sync, release]
+    if: needs.sync.outputs.should_release == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger A32 kernel pre-release build (when KERNEL_DISPATCH_TOKEN is set)
+        env:
+          GH_TOKEN: ${{ secrets.KERNEL_DISPATCH_TOKEN }}
+        run: |
+          if [[ -z "${GH_TOKEN:-}" ]]; then
+            echo "KERNEL_DISPATCH_TOKEN not set; KernelSU_SUSFS_Samsung_SM-A325X upstream-check will pick this up automatically."
+            exit 0
+          fi
+          gh workflow run kernel.yml \
+            --repo Najip/KernelSU_SUSFS_Samsung_SM-A325X \
+            --ref main \
+            -f root_flavor="Both (BakaSU + xxKSU)" \
+            -f commit_mode=Latest \
+            -f release_type=Pre-release
+          echo "Dispatched A32 kernel pre-release build."
