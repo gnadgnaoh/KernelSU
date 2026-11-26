@@ -1,3 +1,8 @@
+> [!NOTE]
+> **Branch `sync-mojito`:** Synced from backslashxx's kernel-side KernelSU updates in [`ximi-mojito/android_kernel_xiaomi_mojito` (`personal` branch)](https://github.com/ximi-mojito/android_kernel_xiaomi_mojito/tree/personal) (starting from commit [`a6e6d9b6`](https://github.com/ximi-mojito/android_kernel_xiaomi_mojito/commit/a6e6d9b6aa38e831121ad86e721990607176fb0c)). It is named `sync-mojito` because the standalone `backslashxx/KernelSU` repository was removed and subsequent kernel-side updates are pulled from that mojito kernel branch.
+>
+> Backslashxx's last untouched commit from `backslashxx/KernelSU` (`9a02a5c1`) is preserved on the [`final`](https://github.com/Najip/xxKSU/tree/final) branch.
+
 **English** | [Español](README_ES.md) | [简体中文](README_CN.md) | [繁體中文](README_TW.md) | [日本語](README_JP.md) | [한국어](README_KR.md) | [Polski](README_PL.md) | [Português (Brasil)](README_PT-BR.md) | [Türkçe](README_TR.md) | [Русский](README_RU.md) | [Tiếng Việt](README_VI.md) | [Indonesia](README_ID.md) | [עברית](README_IW.md) | [हिंदी](README_IN.md) | [Italiano](README_IT.md)
 
 # KernelSU
